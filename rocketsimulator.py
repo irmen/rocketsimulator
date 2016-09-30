@@ -32,11 +32,11 @@ class AnimationWindow(Tk):
 
     def __process_frame(self):
         start = time.time()
-        self.draw()
         if self.continue_animation:
-            duration = time.time() - start
-            budget = 1/self.framerate
-            self.after(int(1000*(budget-duration))-2, self.__process_frame)
+            self.draw()
+        duration = time.time() - start
+        budget = 1/self.framerate
+        self.after(int(1000*(budget-duration))-2, self.__process_frame)
 
     def stop(self):
         self.continue_animation = False
@@ -172,8 +172,8 @@ class RocketSimulatorWindow(AnimationWindow):
         self.cwidth, self.cheight = int(self.canvas["width"]), int(self.canvas["height"])
         self.framerate = 30
         self.launchpad_offset = self.cwidth/6
-        initial_x_pos = self.launchpad_offset-self.cwidth/2
-        self.rocket = Rocket(self.canvas, initial_x_pos)
+        self.initial_x_pos = self.launchpad_offset-self.cwidth/2
+        self.rocket = Rocket(self.canvas, self.initial_x_pos)
         self.launchpad_start = Launchpad(self.canvas, self.launchpad_offset)
         self.launchpad_destination = Launchpad(self.canvas, self.cwidth-self.launchpad_offset)
         self.framecounter = 0
@@ -192,7 +192,8 @@ class RocketSimulatorWindow(AnimationWindow):
 space bar to fire main engine normally
 v   to fire main engine (2x throttle)
 [   right RCS thruster
-]   left RCS thruster"""
+]   left RCS thruster
+r   start over"""
         self.canvas.create_text(220, self.cheight/2-220, text=instructions, fill="green", anchor=W)
         self.canvas.create_text(220, self.cheight/2-140, text="rocket position = ({0:.2f}, {1:.2f})"
                                 .format(self.rocket.position.x, self.rocket.position.y), fill="green", anchor=W)
@@ -242,6 +243,9 @@ v   to fire main engine (2x throttle)
             self.rocket.right_thruster_on = False
         elif char == ']':
             self.rocket.left_thruster_on = False
+        elif char == 'r':
+            self.rocket.set_touchdown_position(self.initial_x_pos)
+            self.continue_animation = True
 
 
 if __name__ == "__main__":
