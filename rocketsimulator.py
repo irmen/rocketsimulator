@@ -193,13 +193,13 @@ space bar to fire main engine normally
 v   to fire main engine (2x throttle)
 [   right RCS thruster
 ]   left RCS thruster"""
-        self.canvas.create_text(200, self.cheight/2-220, text=instructions, fill="green", anchor=W)
-        self.canvas.create_text(200, self.cheight/2-140,
-                                text="Rocket position = ({0:.2f}, {1:.2f})   velocity = {2:.2f}  (vx: {3:.2f} vy: {4:.2f})   rotation speed = {5:.2f}"
-                                .format(self.rocket.position.x, self.rocket.position.y,
-                                        self.rocket.velocity.length,
-                                        self.rocket.velocity.x, self.rocket.velocity.y,
-                                        self.rocket.rotation_speed), fill="green", anchor=W)
+        self.canvas.create_text(220, self.cheight/2-220, text=instructions, fill="green", anchor=W)
+        self.canvas.create_text(220, self.cheight/2-140, text="rocket position = ({0:.2f}, {1:.2f})"
+                                .format(self.rocket.position.x, self.rocket.position.y), fill="green", anchor=W)
+        self.canvas.create_text(220, self.cheight/2-120, text="velocity = {0:.2f}   (vx: {1:.2f} vy: {2:.2f})"
+                                .format(self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y), fill="green", anchor=W)
+        self.canvas.create_text(220, self.cheight/2-100, text="rotation speed = {0:.2f}"
+                                .format(self.rocket.rotation_speed), fill="green", anchor=W)
         # finally the rocket
         self.rocket.draw()
         if self.rocket.crashed:
