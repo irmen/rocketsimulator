@@ -187,7 +187,7 @@ class RocketSimulatorWindow(AnimationWindow):
         self.launchpad_start.draw()
         self.launchpad_destination.draw()
         # instructions and telemetry:
-        instructions = """*** Launch the Falcon 9 rocket and land it successfully at the other launchpad ***
+        instructions = """*** Launch the rocket and land it successfully at the other launchpad ***
 
 space bar to fire main engine normally
 v   to fire main engine (2x throttle)
@@ -245,5 +245,5 @@ v   to fire main engine (2x throttle)
 
 
 if __name__ == "__main__":
-    window = RocketSimulatorWindow(1000, 600, "Space-X Falcon-9 rocket landing simulator")
+    window = RocketSimulatorWindow(1000, 600, "Rocket launch and landing simulator")
     window.mainloop()
