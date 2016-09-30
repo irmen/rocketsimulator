@@ -1,3 +1,9 @@
+"""
+Efficient 2d vector class using complex number type to store x,y coordinates.
+
+Copyright by Irmen de Jong (irmen@razorvine.net).
+Open source software license: MIT.
+"""
 from __future__ import division
 import cmath
 
