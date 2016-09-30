@@ -187,20 +187,24 @@ class RocketSimulatorWindow(AnimationWindow):
         self.launchpad_start.draw()
         self.launchpad_destination.draw()
         # instructions and telemetry:
-        instructions = """*** Launch the rocket and land it successfully at the other launchpad ***
+        instructions = """GOAL:  Launch the rocket and land it safely at the other launchpad!
+You must land the rocket slowly and upright, and must stay within the screen area, or it will crash.
 
-space bar to fire main engine normally
-v   to fire main engine (2x throttle)
-[   right RCS thruster
-]   left RCS thruster
-r   start over"""
-        self.canvas.create_text(220, self.cheight/2-220, text=instructions, fill="green", anchor=W)
-        self.canvas.create_text(220, self.cheight/2-140, text="rocket position = ({0:.2f}, {1:.2f})"
-                                .format(self.rocket.position.x, self.rocket.position.y), fill="green", anchor=W)
-        self.canvas.create_text(220, self.cheight/2-120, text="velocity = {0:.2f}   (vx: {1:.2f} vy: {2:.2f})"
-                                .format(self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y), fill="green", anchor=W)
-        self.canvas.create_text(220, self.cheight/2-100, text="rotation speed = {0:.2f}"
-                                .format(self.rocket.rotation_speed), fill="green", anchor=W)
+CONTROLS:
+  spacebar  -  fire main engine
+  v   -  fire main engine (full throttle)
+  [   -  fire right RCS thruster
+  ]   -  fire left RCS thruster
+  r   -  start over"""
+        self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=NW)
+        telemetry = """TELEMETRY:
+rocket position = {0:.2f}, {1:.2f}
+velocity = {2:.2f}   (vx, vy = {3:.2f}, {4:.2f})
+orientation = {5:.2f}   rotation speed = {6:.2f}
+""".format(self.rocket.position.x, self.rocket.position.y,
+           self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y,
+           self.rocket.rotation, self.rocket.rotation_speed)
+        self.canvas.create_text(520, self.cheight/2-190, text=telemetry, fill="green3", anchor=NW)
         # finally the rocket
         self.rocket.draw()
         if self.rocket.crashed:
