@@ -7,51 +7,7 @@ Open source software license: MIT.
 from __future__ import print_function, division
 import time
 from vectors import Vector2D
-
-try:
-    from tkinter import *
-except ImportError:
-    from Tkinter import *
-
-
-class AnimationWindow(Tk):
-    """
-    Base class for tkinter animation windows. Creates window and binds keyboard events to react upon.
-    """
-    def __init__(self, width, height, windowtitle="animation engine"):
-        Tk.__init__(self)
-        self.wm_title(windowtitle)
-        self.bind("<KeyPress>", lambda event: self.keypress(event.char, (event.x, event.y)))
-        self.bind("<KeyRelease>", lambda event: self.keyrelease(event.char, (event.x, event.y)))
-        self.canvas = Canvas(self, width=width, height=height, background="black", borderwidth=0, highlightthickness=0)
-        self.canvas.pack()
-        self.framerate = 30
-        self.continue_animation = True
-        self.setup()
-        self.after(100, self.__process_frame)
-
-    def __process_frame(self):
-        start = time.time()
-        if self.continue_animation:
-            self.draw()
-        duration = time.time() - start
-        budget = 1/self.framerate
-        self.after(int(1000*(budget-duration))-2, self.__process_frame)
-
-    def stop(self):
-        self.continue_animation = False
-
-    def setup(self):
-        pass
-
-    def draw(self):
-        pass
-
-    def keypress(self, char, mouseposition):
-        pass
-
-    def keyrelease(self, char, mouseposition):
-        pass
+from tkanimation import AnimationWindow, tkinter
 
 
 class Rocket(object):
@@ -92,14 +48,11 @@ class Rocket(object):
         if self.position.y <= 0:
             if 0 < self.velocity.length < 2 and abs(self.rotation) < 0.1:
                 # safe touchdown (low velocity and almost no rotation)
-                print("touchdown!", self.position, self.rotation)
                 self.set_touchdown_position(self.position.x)
             elif self.velocity.length > 0:
-                print("crash on ground", self.position, self.rotation)
                 self.crashed = True
         self.touchdown = self.position.y==0 and self.velocity.length==0
         if self.position.x <= self.cwidth/-2 or self.position.x >= self.cwidth/2 or self.position.y >= self.cheight:
-            print("crashed out of range", self.position)
             self.crashed = True
 
     def apply_force(self, force):
@@ -177,10 +130,11 @@ class RocketSimulatorWindow(AnimationWindow):
         self.launchpad_start = Launchpad(self.canvas, self.launchpad_offset)
         self.launchpad_destination = Launchpad(self.canvas, self.cwidth-self.launchpad_offset)
         self.framecounter = 0
+        self.start_time = time.time()
 
     def draw(self):
         self.update()
-        self.canvas.delete(ALL)
+        self.canvas.delete(tkinter.ALL)
         # ground:
         self.canvas.create_rectangle(0, self.cheight-10, self.cwidth-1, self.cheight-1, outline="chocolate", fill="sienna")
         # launch pads:
@@ -191,12 +145,12 @@ class RocketSimulatorWindow(AnimationWindow):
 You must land the rocket slowly and upright, and must stay within the screen area, or it will crash.
 
 CONTROLS:
-  spacebar  -  fire main engine
-  v   -  fire main engine (full throttle)
-  [   -  fire right RCS thruster
-  ]   -  fire left RCS thruster
-  r   -  start over"""
-        self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=NW)
+  spacebar\t-  fire main engine
+  v\t\t-  fire main engine (full throttle)
+  [  or  ->\t\t-  fire right RCS thruster
+  ]  or  <-\t\t-  fire left RCS thruster
+  r\t\t-  start over"""
+        self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=tkinter.NW)
         telemetry = """TELEMETRY:
 rocket position = {0:.2f}, {1:.2f}
 velocity = {2:.2f}   (vx, vy = {3:.2f}, {4:.2f})
@@ -204,7 +158,7 @@ orientation = {5:.2f}   rotation speed = {6:.2f}
 """.format(self.rocket.position.x, self.rocket.position.y,
            self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y,
            self.rocket.rotation, self.rocket.rotation_speed)
-        self.canvas.create_text(520, self.cheight/2-190, text=telemetry, fill="green3", anchor=NW)
+        self.canvas.create_text(540, self.cheight/2-190, text=telemetry, fill="green3", anchor=tkinter.NW)
         # finally the rocket
         self.rocket.draw()
         if self.rocket.crashed:
@@ -217,6 +171,9 @@ orientation = {5:.2f}   rotation speed = {6:.2f}
             if self.launchpad_destination.is_rocket_above(self.rocket):
                 location = "ON LAUNCHPAD BETA - WELL DONE!"
             self.canvas.create_text(self.cwidth/2, self.cheight/2, text="ROCKET TOUCHDOWN\n"+location, fill="pink")
+        # framecounter
+        fps = int(self.framecounter / (time.time() - self.start_time))
+        self.canvas.create_text(self.cwidth, 0, text="FPS: {0:d} ".format(fps), fill="blue", anchor=tkinter.NE)
 
     def update(self):
         self.framecounter += 1
@@ -231,21 +188,23 @@ orientation = {5:.2f}   rotation speed = {6:.2f}
         self.rocket.update()
 
     def keypress(self, char, mouseposition):
+        char = char.lower()
         if char == ' ':
             self.rocket.engine_throttle = 1.0    # regular 100% thrust
         elif char == 'v':
             self.rocket.engine_throttle = 2.0    # 200% thrust
-        elif char == '[':
+        elif char == '[' or char == 'left':
             self.rocket.right_thruster_on = True
-        elif char == ']':
+        elif char == ']' or char == 'right':
             self.rocket.left_thruster_on = True
 
     def keyrelease(self, char, mouseposition):
+        char = char.lower()
         if char in (' ', 'v'):
             self.rocket.engine_throttle = 0.0
-        elif char == '[':
+        elif char == '[' or char == 'left':
             self.rocket.right_thruster_on = False
-        elif char == ']':
+        elif char == ']' or char == 'right':
             self.rocket.left_thruster_on = False
         elif char == 'r':
             self.rocket.set_touchdown_position(self.initial_x_pos)
