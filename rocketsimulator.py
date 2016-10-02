@@ -68,8 +68,7 @@ class Rocket(object):
         scale = 6
         # rotate and position the rocket
         points = (Vector2D(xy) for xy in self.rocket_vertices)
-        if self.velocity.length:
-            points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
+        points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
         points = (scale*v+screen_offset for v in points)
         points = [(v.x, self.cheight-v.y) for v in points]
         self.canvas.create_polygon(points, fill="blue", outline="lightgrey")
@@ -77,15 +76,13 @@ class Rocket(object):
             # rotate and position the engine flame
             points = ((x, y*self.engine_throttle) for x, y in self.engine_flame_vertices)
             points = (Vector2D(xy) for xy in points)
-            if self.velocity.length:
-                points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
+            points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
             points = (scale*v+screen_offset for v in points)
             points = [(v.x, self.cheight-v.y) for v in points]
             self.canvas.create_polygon(points, outline="orange", fill="yellow")
         # rotate and position the left and right thrusters
         points = (Vector2D(xy) for xy in self.thruster_positions)
-        if self.velocity.length:
-            points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
+        points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
         points = (scale*v+screen_offset for v in points)
         points = [(v.x, self.cheight-v.y) for v in points]
         if self.left_thruster_on:
