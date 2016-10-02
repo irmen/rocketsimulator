@@ -59,7 +59,8 @@ class Rocket(object):
         self.acceleration += force
 
     def apply_rotation(self, force):
-        self.rotation_acceleration += force
+        if not self.touchdown:
+            self.rotation_acceleration += force
 
     def draw(self):
         screen_offset = Vector2D((self.cwidth/2, 10))
@@ -93,8 +94,7 @@ class Rocket(object):
             self.canvas.create_oval(points[1][0]-3, points[1][1]-3, points[1][0]+3, points[1][1]+3, outline="orange", fill="yellow")
 
     def apply_gravity(self, gravity):
-        # if the rocket is flying (and not standing on a launch pad), gravity has effect
-        if self.position.y > 0 or self.velocity.length > 0:
+        if not self.touchdown:
             self.apply_force(Vector2D((0, -gravity)))  # gravity is a force pointing downwards
 
 

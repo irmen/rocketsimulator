@@ -20,8 +20,8 @@ class AnimationWindow(tkinter.Tk):
     def __init__(self, width, height, windowtitle="animation engine"):
         tkinter.Tk.__init__(self)
         self.wm_title(windowtitle)
-        self.bind("<KeyPress>", lambda event: self.keypress(event.char or event.keysym, (event.x, event.y)))
-        self.bind("<KeyRelease>", lambda event: self.keyrelease(event.char or event.keysym, (event.x, event.y)))
+        self.bind("<KeyPress>", lambda event: self.keypress(*self._keyevent(event)))
+        self.bind("<KeyRelease>", lambda event: self.keyrelease(*self._keyevent(event)))
         self.canvas = tkinter.Canvas(self, width=width, height=height, background="black", borderwidth=0, highlightthickness=0)
         self.canvas.pack()
         self.framerate = 30
@@ -40,6 +40,12 @@ class AnimationWindow(tkinter.Tk):
             self.after_idle(self.__process_frame)
         else:
             self.after(sleep, self.__process_frame)
+
+    def _keyevent(self, event):
+        c = event.char
+        if not c or ord(c)>255:
+            c = event.keysym
+        return c, (event.x, event.y)
 
     def stop(self):
         self.continue_animation = False
