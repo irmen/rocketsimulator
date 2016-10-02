@@ -35,7 +35,7 @@ class AnimationWindow(tkinter.Tk):
             self.draw()
         duration = time.time() - start
         budget = 1/self.framerate
-        sleep = int(1000*(budget-duration))
+        sleep = int(1000*(budget-duration))-2
         if sleep < 1:
             self.after_idle(self.__process_frame)
         else:
