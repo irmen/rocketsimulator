@@ -6,6 +6,7 @@ Open source software license: MIT.
 """
 from __future__ import print_function, division
 import time
+import math
 from vectors import Vector2D
 from tkanimation import AnimationWindow, tkinter
 
@@ -42,11 +43,11 @@ class Rocket(object):
         self.velocity += self.acceleration
         self.position += self.velocity
         self.acceleration *= 0
-        self.rotation += self.rotation_speed
+        self.rotation = (self.rotation + self.rotation_speed) % (2*math.pi)
         self.rotation_speed += self.rotation_acceleration
         self.rotation_acceleration = 0.0
         if self.position.y <= 0:
-            if 0 < self.velocity.length < 2 and abs(self.rotation) < 0.1:
+            if 0 < self.velocity.length < 2 and abs(self.rotation) < 0.15:
                 # safe touchdown (low velocity and almost no rotation)
                 self.set_touchdown_position(self.position.x)
             elif self.velocity.length > 0:
@@ -148,13 +149,15 @@ CONTROLS:
   ]  or  <-\t\t-  fire left RCS thruster
   r\t\t-  start over"""
         self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=tkinter.NW)
-        telemetry = """TELEMETRY:
+        rotation_degrees = 360- (180 * self.rocket.rotation / math.pi)
+        rotation_speed_degrees = self.rocket.rotation_speed / math.pi * self.framerate * 180
+        telemetry = u"""TELEMETRY:
 rocket position = {0:.2f}, {1:.2f}
 velocity = {2:.2f}   (vx, vy = {3:.2f}, {4:.2f})
-orientation = {5:.2f}   rotation speed = {6:.2f}
+orientation = {5:.2f}\u00b0   rotation speed = {6:.2f}\u00b0/sec
 """.format(self.rocket.position.x, self.rocket.position.y,
            self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y,
-           self.rocket.rotation, self.rocket.rotation_speed)
+           rotation_degrees, rotation_speed_degrees)
         self.canvas.create_text(540, self.cheight/2-190, text=telemetry, fill="green3", anchor=tkinter.NW)
         # finally the rocket
         self.rocket.draw()
