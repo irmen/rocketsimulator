@@ -26,7 +26,7 @@ class PerformanceTestWindow(AnimationWindow):
         self.update()
         self.canvas.delete(tkinter.ALL)
         for rocket in self.rockets:
-            rocket.draw()
+            rocket.draw(self.canvas)
         # framecounter
         if time.time()-self.start_time:
             fps = int(self.framecounter / (time.time() - self.start_time))
@@ -36,7 +36,7 @@ class PerformanceTestWindow(AnimationWindow):
         self.canvas.create_text(self.cwidth, 30, text="press SPACE to add 10 more ", fill="yellow", anchor=tkinter.NE)
 
     def add_rocket(self):
-        rocket = Rocket(self.canvas)
+        rocket = Rocket(self.cwidth, self.cheight)
         rocket.rotation_speed = random.uniform(-.3,.3)
         rocket.engine_throttle = 1
         rocket.position = Vector2D((random.randint(-self.cwidth/2,self.cwidth/2), random.randint(0,self.cheight)))

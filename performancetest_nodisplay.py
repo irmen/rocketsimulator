@@ -15,17 +15,6 @@ if sys.version_info < (3,0):
     input = raw_input
 
 
-class DummyCanvas(object):
-    def __getitem__(self, item):
-        if item=="width":
-            return 1000
-        if item=="height":
-            return 1000
-        raise KeyError
-    def create_polygon(self, points, outline="orange", fill="yellow"):
-        pass
-
-
 class PerformanceTest(object):
     def run(self):
         self.cwidth = 1000
@@ -44,13 +33,17 @@ class PerformanceTest(object):
             input("\nenter to run again with {:d} extra rockets...:".format(rockets_added_per_iteration))
 
     def simulate(self, num_frames=10000):
+        class DummyCanvas(object):
+            def create_polygon(self, points, outline="orange", fill="yellow"):
+                pass
+        dummycanvas = DummyCanvas()
         for _ in range(num_frames):
             self.update()
             for rocket in self.rockets:
-                rocket.draw()
+                rocket.draw(dummycanvas)
 
     def add_rocket(self):
-        rocket = Rocket(DummyCanvas())
+        rocket = Rocket(self.cwidth, self.cheight)
         rocket.rotation_speed = random.uniform(-.3,.3)
         rocket.engine_throttle = 1
         rocket.position = Vector2D((random.randint(-self.cwidth/2,self.cwidth/2), random.randint(0,self.cheight)))

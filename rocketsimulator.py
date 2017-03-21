@@ -17,9 +17,8 @@ class Rocket(object):
     The main engine provides force to move the rocket forwards, the RCS (reaction control system)
     thrusters provide rotation around the rocket's center of mass (somewhere in the lower section)
     """
-    def __init__(self, canvas, initial_x_position=None):
-        self.canvas = canvas
-        self.cwidth, self.cheight = int(canvas["width"]), int(canvas["height"])
+    def __init__(self, world_width, world_height, initial_x_position=None):
+        self.world_width, self.world_height = world_width, world_height
         self.rocket_vertices = [(-2, 0), (-1, 1), (-1, 7), (0, 8), (1, 7), (1, 1), (2, 0)]
         self.rotation_point = (0, 2.5)
         self.engine_flame_vertices = [(-1, 0), (-1.5, -2), (-0.5, -2), (-1, -4), (0, -3), (1, -4), (0.5, -2), (1.5, -2), (1, 0)]
@@ -53,7 +52,7 @@ class Rocket(object):
             elif self.velocity.length > 0:
                 self.crashed = True
         self.touchdown = self.position.y==0 and self.velocity.length==0
-        if self.position.x <= self.cwidth/-2 or self.position.x >= self.cwidth/2 or self.position.y >= self.cheight:
+        if self.position.x <= self.world_width/-2 or self.position.x >= self.world_width/2 or self.position.y >= self.world_height:
             self.crashed = True
 
     def apply_force(self, force):
@@ -63,32 +62,32 @@ class Rocket(object):
         if not self.touchdown:
             self.rotation_acceleration += force
 
-    def draw(self):
-        screen_offset = Vector2D((self.cwidth/2, 10))
+    def draw(self, canvas):
+        screen_offset = Vector2D((self.world_width / 2, 10))
         screen_offset += self.position
         scale = 6
         # rotate and position the rocket
         points = [Vector2D(xy) for xy in self.rocket_vertices]
         points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
         points = [scale*v+screen_offset for v in points]
-        points = [(v.x, self.cheight-v.y) for v in points]
-        self.canvas.create_polygon(points, fill="blue", outline="lightgrey")
+        points = [(v.x, self.world_height - v.y) for v in points]
+        canvas.create_polygon(points, fill="blue", outline="lightgrey")
         if self.engine_throttle:
             # rotate and position the engine flame
             points = [Vector2D((x, y*self.engine_throttle)) for x, y in self.engine_flame_vertices]
             points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
             points = [scale*v+screen_offset for v in points]
-            points = [(v.x, self.cheight-v.y) for v in points]
-            self.canvas.create_polygon(points, outline="orange", fill="yellow")
+            points = [(v.x, self.world_height - v.y) for v in points]
+            canvas.create_polygon(points, outline="orange", fill="yellow")
         # rotate and position the left and right thrusters
         points = [Vector2D(xy) for xy in self.thruster_positions]
         points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
         points = [scale*v+screen_offset for v in points]
-        points = [(v.x, self.cheight-v.y) for v in points]
+        points = [(v.x, self.world_height - v.y) for v in points]
         if self.left_thruster_on:
-            self.canvas.create_oval(points[0][0]-3, points[0][1]-3, points[0][0]+3, points[0][1]+3, outline="orange", fill="yellow")
+            canvas.create_oval(points[0][0]-3, points[0][1]-3, points[0][0]+3, points[0][1]+3, outline="orange", fill="yellow")
         if self.right_thruster_on:
-            self.canvas.create_oval(points[1][0]-3, points[1][1]-3, points[1][0]+3, points[1][1]+3, outline="orange", fill="yellow")
+            canvas.create_oval(points[1][0]-3, points[1][1]-3, points[1][0]+3, points[1][1]+3, outline="orange", fill="yellow")
 
     def apply_gravity(self, gravity):
         if not self.touchdown:
@@ -123,7 +122,7 @@ class RocketSimulatorWindow(AnimationWindow):
         self.framerate = 30
         self.launchpad_offset = self.cwidth/6
         self.initial_x_pos = self.launchpad_offset-self.cwidth/2
-        self.rocket = Rocket(self.canvas, self.initial_x_pos)
+        self.rocket = Rocket(self.cwidth, self.cheight, self.initial_x_pos)
         self.launchpad_start = Launchpad(self.canvas, self.launchpad_offset)
         self.launchpad_destination = Launchpad(self.canvas, self.cwidth-self.launchpad_offset)
         self.framecounter = 0
@@ -159,7 +158,7 @@ orientation = {5:.2f}\u00b0   rotation speed = {6:.2f}\u00b0/sec
            rotation_degrees, rotation_speed_degrees)
         self.canvas.create_text(540, self.cheight/2-190, text=telemetry, fill="green3", anchor=tkinter.NW)
         # finally the rocket
-        self.rocket.draw()
+        self.rocket.draw(self.canvas)
         if self.rocket.crashed:
             self.canvas.create_text(self.cwidth/2, self.cheight/2, text="ROCKET LOST !!!", fill="pink")
             self.stop()
