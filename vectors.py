@@ -19,13 +19,28 @@ class Vector2D(object):
     def x(self):
         return self.vec.real
 
+    @x.setter
+    def x(self, value):
+        self.vec = complex(value, self.vec.imag)
+
     @property
     def y(self):
         return self.vec.imag
 
+    @y.setter
+    def y(self, value):
+        self.vec = complex(self.vec.real, value)
+
     @property
     def xy(self):
         return self.vec.real, self.vec.imag
+
+    @xy.setter
+    def xy(self, value):
+        if type(value) is complex:
+            self.vec = value
+        else:
+            self.vec = complex(*value)
 
     @property
     def length(self):
@@ -37,6 +52,12 @@ class Vector2D(object):
             return cmath.phase(self.vec)
         else:
             raise ValueError("vector (0,0) has no defined heading")
+
+    def flipx(self):
+        self.vec = -self.vec.conjugate()
+
+    def flipy(self):
+        self.vec = self.vec.conjugate()
 
     def rotate(self, angle):
         self.vec *= cmath.exp(angle*1j)

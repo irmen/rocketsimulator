@@ -50,15 +50,14 @@ class PerformanceTestWindow(AnimationWindow):
             self.start_time = time.time()
             self.framecounter = 0
 
-
     def update(self):
         self.framecounter += 1
         for rocket in self.rockets:
             rocket.update()
             if not(-self.cwidth/2 < rocket.position.x < self.cwidth/2):
-                rocket.velocity = Vector2D((-rocket.velocity.x, rocket.velocity.y))
+                rocket.velocity.flipx()
             if not(0<rocket.position.y<self.cheight):
-                rocket.velocity = Vector2D((rocket.velocity.x, -rocket.velocity.y))
+                rocket.velocity.flipy()
 
 
 if __name__ == "__main__":

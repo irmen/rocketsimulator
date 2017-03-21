@@ -68,7 +68,7 @@ class Rocket(object):
         screen_offset += self.position
         scale = 6
         # rotate and position the rocket
-        points = (Vector2D(xy) for xy in self.rocket_vertices)
+        points = (Vector2D(xy) for xy in self.rocket_vertices)    # XXX optimize: store vectors instead of tuples as vertices
         points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
         points = (scale*v+screen_offset for v in points)
         points = [(v.x, self.cheight-v.y) for v in points]
@@ -76,13 +76,13 @@ class Rocket(object):
         if self.engine_throttle:
             # rotate and position the engine flame
             points = ((x, y*self.engine_throttle) for x, y in self.engine_flame_vertices)
-            points = (Vector2D(xy) for xy in points)
+            points = (Vector2D(xy) for xy in points)    # XXX optimize: store vectors instead of tuples as flame vertices
             points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
             points = (scale*v+screen_offset for v in points)
             points = [(v.x, self.cheight-v.y) for v in points]
             self.canvas.create_polygon(points, outline="orange", fill="yellow")
         # rotate and position the left and right thrusters
-        points = (Vector2D(xy) for xy in self.thruster_positions)
+        points = (Vector2D(xy) for xy in self.thruster_positions)   # XXX optimize: store vectors instead of tuples
         points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
         points = (scale*v+screen_offset for v in points)
         points = [(v.x, self.cheight-v.y) for v in points]
