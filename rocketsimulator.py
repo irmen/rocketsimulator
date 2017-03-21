@@ -68,23 +68,22 @@ class Rocket(object):
         screen_offset += self.position
         scale = 6
         # rotate and position the rocket
-        points = (Vector2D(xy) for xy in self.rocket_vertices)    # XXX optimize: store vectors instead of tuples as vertices
-        points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
-        points = (scale*v+screen_offset for v in points)
+        points = [Vector2D(xy) for xy in self.rocket_vertices]
+        points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
+        points = [scale*v+screen_offset for v in points]
         points = [(v.x, self.cheight-v.y) for v in points]
         self.canvas.create_polygon(points, fill="blue", outline="lightgrey")
         if self.engine_throttle:
             # rotate and position the engine flame
-            points = ((x, y*self.engine_throttle) for x, y in self.engine_flame_vertices)
-            points = (Vector2D(xy) for xy in points)    # XXX optimize: store vectors instead of tuples as flame vertices
-            points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
-            points = (scale*v+screen_offset for v in points)
+            points = [Vector2D((x, y*self.engine_throttle)) for x, y in self.engine_flame_vertices]
+            points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
+            points = [scale*v+screen_offset for v in points]
             points = [(v.x, self.cheight-v.y) for v in points]
             self.canvas.create_polygon(points, outline="orange", fill="yellow")
         # rotate and position the left and right thrusters
-        points = (Vector2D(xy) for xy in self.thruster_positions)   # XXX optimize: store vectors instead of tuples
-        points = (v.rotate_around(self.rotation_point, self.rotation) for v in points)
-        points = (scale*v+screen_offset for v in points)
+        points = [Vector2D(xy) for xy in self.thruster_positions]
+        points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
+        points = [scale*v+screen_offset for v in points]
         points = [(v.x, self.cheight-v.y) for v in points]
         if self.left_thruster_on:
             self.canvas.create_oval(points[0][0]-3, points[0][1]-3, points[0][0]+3, points[0][1]+3, outline="orange", fill="yellow")
