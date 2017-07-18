@@ -21,6 +21,7 @@ class RocketSimulation(threading.Thread):
         self.cwidth = cwidth
         self.cheight = cheight
         self.rockets = []
+        self.draw_calls = []
         self.framecounter = 0
         self.start_simulate = threading.Event()
         self.start_simulate.set()
@@ -43,6 +44,9 @@ class RocketSimulation(threading.Thread):
                     rocket.velocity.flipx()
                 if not(0<rocket.position.y<self.cheight):
                     rocket.velocity.flipy()
+            self.draw_calls = []
+            for rocket in self.rockets:
+                self.draw_calls.extend(rocket.draw_calls())
             self.framecounter += 1
             self.frame_done.set()
 
@@ -67,9 +71,7 @@ class PerformanceTestWindow(AnimationWindow):
         # wait for the simulation to complete the data for the new frame
         self.simulation.frame_done.wait()
         self.simulation.frame_done.clear()
-        draw_calls = []
-        for rocket in self.simulation.rockets:
-            draw_calls.extend(rocket.draw_calls(self.canvas))
+        draw_calls = self.simulation.draw_calls
         self.simulation.start_simulate.set()
         # clear the screen and draw the next frame, while the simulation runs in the background thread for the next frame
         self.canvas.delete(tkinter.ALL)
@@ -84,7 +86,7 @@ class PerformanceTestWindow(AnimationWindow):
 
     def perform_draw_calls(self, calls):
         for c in calls:
-            c[0](*c[1], **c[2])
+            getattr(self.canvas, c[0])(*c[1], **c[2])
 
     def keypress(self, char, mouseposition):
         if char==' ':

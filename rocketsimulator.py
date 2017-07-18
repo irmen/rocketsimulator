@@ -63,10 +63,10 @@ class Rocket(object):
             self.rotation_acceleration += force
 
     def draw(self, canvas):
-        for c in self.draw_calls(canvas):
-            c[0](*c[1], **c[2])
+        for c in self.draw_calls():
+            getattr(canvas, c[0])(*c[1], **c[2])
 
-    def draw_calls(self, canvas):
+    def draw_calls(self):
         def call(method, *vargs, **kwargs):
             return method, vargs, kwargs
         calls = []
@@ -78,23 +78,23 @@ class Rocket(object):
         points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
         points = [scale*v+screen_offset for v in points]
         points = [(v.x, self.world_height - v.y) for v in points]
-        calls.append(call(canvas.create_polygon, points, fill="blue", outline="lightgrey"))
+        calls.append(call("create_polygon", points, fill="blue", outline="lightgrey"))
         if self.engine_throttle:
             # rotate and position the engine flame
             points = [Vector2D((x, y*self.engine_throttle)) for x, y in self.engine_flame_vertices]
             points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
             points = [scale*v+screen_offset for v in points]
             points = [(v.x, self.world_height - v.y) for v in points]
-            calls.append(call(canvas.create_polygon, points, outline="orange", fill="yellow"))
+            calls.append(call("create_polygon", points, outline="orange", fill="yellow"))
         # rotate and position the left and right thrusters
         points = [Vector2D(xy) for xy in self.thruster_positions]
         points = [v.rotate_around(self.rotation_point, self.rotation) for v in points]
         points = [scale*v+screen_offset for v in points]
         points = [(v.x, self.world_height - v.y) for v in points]
         if self.left_thruster_on:
-            calls.append(call(canvas.create_oval, points[0][0]-3, points[0][1]-3, points[0][0]+3, points[0][1]+3, outline="orange", fill="yellow"))
+            calls.append(call("create_oval", points[0][0]-3, points[0][1]-3, points[0][0]+3, points[0][1]+3, outline="orange", fill="yellow"))
         if self.right_thruster_on:
-            calls.append(call(canvas.create_oval, points[1][0]-3, points[1][1]-3, points[1][0]+3, points[1][1]+3, outline="orange", fill="yellow"))
+            calls.append(call("create_oval", points[1][0]-3, points[1][1]-3, points[1][0]+3, points[1][1]+3, outline="orange", fill="yellow"))
         return calls
 
     def apply_gravity(self, gravity):
