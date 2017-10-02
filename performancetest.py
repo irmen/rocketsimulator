@@ -15,7 +15,7 @@ from rocketsimulator import Rocket
 class PerformanceTestWindow(AnimationWindow):
     def setup(self):
         self.cwidth, self.cheight = int(self.canvas["width"]), int(self.canvas["height"])
-        self.framerate = 60
+        self.set_frame_rate(60)
         self.rockets = []
         self.framecounter = 0
         self.start_time = time.time()
@@ -29,7 +29,7 @@ class PerformanceTestWindow(AnimationWindow):
             rocket.draw(self.canvas)
         # framecounter
         if time.time()-self.start_time:
-            fps = int(self.framecounter / (time.time() - self.start_time))
+            fps = round(self.framecounter / (time.time() - self.start_time))
         else:
             fps = 0
         self.canvas.create_text(self.cwidth, 0, text="#ROCKETS: {0:d}  FPS: {1:d} ".format(len(self.rockets), fps), fill="yellow", anchor=tkinter.NE)
@@ -44,7 +44,7 @@ class PerformanceTestWindow(AnimationWindow):
         self.rockets.append(rocket)
 
     def keypress(self, char, mouseposition):
-        if char==' ':
+        if char == ' ':
             for _ in range(10):
                 self.add_rocket()
             self.start_time = time.time()

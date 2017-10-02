@@ -64,7 +64,7 @@ class PerformanceTestWindow(AnimationWindow):
         self.cwidth, self.cheight = int(self.canvas["width"]), int(self.canvas["height"])
         self.simulation = RocketSimulation(self.cwidth, self.cheight, 10)
         self.simulation.start()
-        self.framerate = 200
+        self.set_frame_rate(60)
 
     def draw(self):
         # self.update()

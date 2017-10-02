@@ -123,11 +123,10 @@ class Launchpad(object):
 
 class RocketSimulatorWindow(AnimationWindow):
     """
-    The actual rocket landing simulatino game window!
+    The actual rocket landing simulation game window!
     """
     def setup(self):
         self.cwidth, self.cheight = int(self.canvas["width"]), int(self.canvas["height"])
-        self.framerate = 30
         self.launchpad_offset = self.cwidth/6
         self.initial_x_pos = self.launchpad_offset-self.cwidth/2
         self.rocket = Rocket(self.cwidth, self.cheight, self.initial_x_pos)
@@ -135,6 +134,7 @@ class RocketSimulatorWindow(AnimationWindow):
         self.launchpad_destination = Launchpad(self.canvas, self.cwidth-self.launchpad_offset)
         self.framecounter = 0
         self.start_time = time.time()
+        self.set_frame_rate(30)
 
     def draw(self):
         self.update()
@@ -155,8 +155,8 @@ CONTROLS:
   ]  or  <-\t\t-  fire left RCS thruster
   r\t\t-  start over"""
         self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=tkinter.NW)
-        rotation_degrees = 360- (180 * self.rocket.rotation / math.pi)
-        rotation_speed_degrees = self.rocket.rotation_speed / math.pi * self.framerate * 180
+        rotation_degrees = 360 - (180 * self.rocket.rotation / math.pi)
+        rotation_speed_degrees = self.rocket.rotation_speed / math.pi * self.frame_rate * 180
         telemetry = u"""TELEMETRY:
 rocket position = {0:.2f}, {1:.2f}
 velocity = {2:.2f}   (vx, vy = {3:.2f}, {4:.2f})
@@ -178,7 +178,7 @@ orientation = {5:.2f}\u00b0   rotation speed = {6:.2f}\u00b0/sec
                 location = "ON LAUNCHPAD BETA - WELL DONE!"
             self.canvas.create_text(self.cwidth/2, self.cheight/2, text="ROCKET TOUCHDOWN\n"+location, fill="pink")
         # framecounter
-        fps = int(self.framecounter / (time.time() - self.start_time))
+        fps = round(self.framecounter / (time.time() - self.start_time))
         self.canvas.create_text(self.cwidth, 0, text="FPS: {0:d} ".format(fps), fill="blue", anchor=tkinter.NE)
 
     def update(self):

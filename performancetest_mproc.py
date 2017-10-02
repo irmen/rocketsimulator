@@ -19,11 +19,11 @@ class PerformanceTestWindow(AnimationWindow):
     def setup(self):
         self.cwidth, self.cheight = int(self.canvas["width"]), int(self.canvas["height"])
         self.simulation = Pyro4.Proxy("PYRO:rocket_simulation@localhost:33444")
-        self.framerate = 200
         self.start_time = time.time()
         self.framecounter = 0
         self.num_rockets = 10
         self.simulation.init(self.cwidth, self.cheight, self.num_rockets)
+        self.set_frame_rate(60)
 
     def draw(self):
         # self.update()

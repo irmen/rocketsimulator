@@ -24,22 +24,29 @@ class AnimationWindow(tkinter.Tk):
         self.bind("<KeyRelease>", lambda event: self.keyrelease(*self._keyevent(event)))
         self.canvas = tkinter.Canvas(self, width=width, height=height, background="black", borderwidth=0, highlightthickness=0)
         self.canvas.pack()
-        self.framerate = 30
+        self.set_frame_rate(30)
+        self.gfxupdate_starttime = time.perf_counter()
+        self.graphics_update_dt = 0.0
         self.continue_animation = True
         self.setup()
-        self.after(100, self.__process_frame)
+        self.after(10, self._frame_tick)
 
-    def __process_frame(self):
-        start = time.time()
-        if self.continue_animation:
-            self.draw()
-        duration = time.time() - start
-        budget = 1/self.framerate
-        sleep = int(1000*(budget-duration))-2
-        if sleep < 1:
-            self.after_idle(self.__process_frame)
-        else:
-            self.after(sleep, self.__process_frame)
+    def set_frame_rate(self, framerate):
+        self.frame_rate = framerate
+        self.frame_time = 1 / framerate
+
+    def _frame_tick(self):
+        now = time.perf_counter()
+        dt = now - self.gfxupdate_starttime
+        self.graphics_update_dt += dt
+        if self.graphics_update_dt > self.frame_time:
+            self.graphics_update_dt -= self.frame_time
+            if self.graphics_update_dt >= self.frame_time:
+                print("Gfx update too slow to reach {:d} fps!".format(self.frame_rate))
+            if self.continue_animation:
+                self.draw()
+        self.gfxupdate_starttime = now
+        self.after(1000 // (self.frame_rate*2), self._frame_tick)
 
     def _keyevent(self, event):
         c = event.char
