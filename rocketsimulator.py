@@ -149,12 +149,12 @@ class RocketSimulatorWindow(AnimationWindow):
 You must land the rocket slowly and upright, and must stay within the screen area, or it will crash.
 
 CONTROLS:
-  spacebar\t-  fire main engine
-  v\t\t-  fire main engine (full throttle)
-  [  or  ->\t\t-  fire right RCS thruster
-  ]  or  <-\t\t-  fire left RCS thruster
+  shift\t\t-  fire main engine (normal throttle)
+  ctrl\t\t-  fire main engine (max throttle)
+  -> (cursor right)\t-  fire right RCS thruster
+  <- (cursor left)\t-  fire left RCS thruster
   r\t\t-  start over"""
-        self.canvas.create_text(220, self.cheight/2-250, text=instructions, fill="green4", anchor=tkinter.NW)
+        self.canvas.create_text(150, self.cheight/2-250, text=instructions, fill="green4", anchor=tkinter.NW)
         rotation_degrees = 360 - (180 * self.rocket.rotation / math.pi)
         rotation_speed_degrees = self.rocket.rotation_speed / math.pi * self.frame_rate * 180
         telemetry = u"""TELEMETRY:
@@ -164,7 +164,7 @@ orientation = {5:.2f}\u00b0   rotation speed = {6:.2f}\u00b0/sec
 """.format(self.rocket.position.x, self.rocket.position.y,
            self.rocket.velocity.length, self.rocket.velocity.x, self.rocket.velocity.y,
            rotation_degrees, rotation_speed_degrees)
-        self.canvas.create_text(540, self.cheight/2-190, text=telemetry, fill="green3", anchor=tkinter.NW)
+        self.canvas.create_text(560, self.cheight/2-190, text=telemetry, fill="green3", anchor=tkinter.NW)
         # finally the rocket
         self.rocket.draw(self.canvas)
         if self.rocket.crashed:
@@ -195,22 +195,22 @@ orientation = {5:.2f}\u00b0   rotation speed = {6:.2f}\u00b0/sec
 
     def keypress(self, char, mouseposition):
         char = char.lower()
-        if char == ' ':
+        if char.startswith("shift"):
             self.rocket.engine_throttle = 1.0    # regular 100% thrust
-        elif char == 'v':
+        elif char.startswith("control"):
             self.rocket.engine_throttle = 2.0    # 200% thrust
-        elif char == '[' or char == 'left':
+        elif char == 'left':
             self.rocket.right_thruster_on = True
-        elif char == ']' or char == 'right':
+        elif char == 'right':
             self.rocket.left_thruster_on = True
 
     def keyrelease(self, char, mouseposition):
         char = char.lower()
-        if char in (' ', 'v'):
+        if char.startswith(("shift", "control")):
             self.rocket.engine_throttle = 0.0
-        elif char == '[' or char == 'left':
+        elif char == 'left':
             self.rocket.right_thruster_on = False
-        elif char == ']' or char == 'right':
+        elif char == 'right':
             self.rocket.left_thruster_on = False
         elif char == 'r':
             self.rocket.set_touchdown_position(self.initial_x_pos)
